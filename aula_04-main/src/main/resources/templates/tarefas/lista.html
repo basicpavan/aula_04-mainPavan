@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Lista de Tarefas</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Minhas Tarefas</h1>
+
+    <p>
+        Você tem <span th:text="${total}">0</span> tarefas
+        (<span th:text="${pendentes}">0</span> pendentes,
+        <span th:text="${concluidas}">0</span> concluídas)
+    </p>
+
+    <div style="margin-bottom: 20px;">
+        <a href="/tarefas"
+           class="filtro-link"
+           th:classappend="${filtroAtual == 'todas' || filtroAtual == null} ? 'ativo' : ''">Todas</a>
+
+        <a href="/tarefas?filtro=pendentes"
+           class="filtro-link"
+           th:classappend="${filtroAtual == 'pendentes'} ? 'ativo' : ''">Pendentes</a>
+
+        <a href="/tarefas?filtro=concluidas"
+           class="filtro-link"
+           th:classappend="${filtroAtual == 'concluidas'} ? 'ativo' : ''">Concluídas</a>
+    </div>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Descrição</th>
+            <th>Data de Criação</th>
+            <th>Status</th>
+            <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="tarefa : ${tarefas}">
+            <td th:text="${tarefa.id}">1</td>
+            <td th:text="${tarefa.titulo}">Título de Exemplo</td>
+            <td th:text="${tarefa.descricao}">Descrição de Exemplo</td>
+            <td th:text="${#temporals.format(tarefa.dataCriacao, 'dd/MM/yyyy')}">10/10/2025</td>
+            <td>
+                <span class="status"
+                      th:classappend="${tarefa.concluida ? 'status-concluida' : 'status-pendente'}"
+                      th:text="${tarefa.concluida ? 'Concluída' : 'Pendente'}">Pendente</span>
+            </td>
+            <td class="actions">
+                <a th:href="@{/tarefas/status/{id}(id=${tarefa.id})}">
+                    <button type="button" class="btn btn-sm btn-info" th:text="${tarefa.concluida ? 'Reabrir' : 'Concluir'}"></button>
+                </a>
+
+                <a th:href="@{/tarefas/editar/{id}(id=${tarefa.id})}">
+                    <button type="button" class="btn btn-sm btn-secondary">Editar</button>
+                </a>
+
+                <form th:action="@{/tarefas/excluir/{id}(id=${tarefa.id})}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja excluir esta tarefa?');">Excluir</button>
+                </form>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(tarefas)}">
+            <td colspan="6" class="empty-message">Nenhuma tarefa encontrada para este filtro.</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div style="margin-top: 20px;">
+        <a th:href="@{/tarefas/novo}">
+            <button type="button" class="btn btn-primary">Criar Nova Tarefa</button>
+        </a>
+    </div>
+
+</div>
+
+</body>
+</html>
